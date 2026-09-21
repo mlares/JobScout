@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tailored-cover-letters"
+version = "0.2.0"
+description = "Generate evidence-grounded cover letters from a candidate profile and job description."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "openai>=1.66",
+    "pip>=26.2.1",
+    "python-dotenv>=1.0",
+    "qrcode[pil]>=8.0",
+    "reportlab>=4.0",
+]
+
+[project.scripts]
+cover-letter = "cover_letters.cli:main"
+
+[dependency-groups]
+dev = ["pypdf>=6.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

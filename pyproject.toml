@@ -1,0 +1,19 @@
+[project]
+name = "career-workspace"
+version = "0.1.0"
+description = "Private-data-safe monorepo for local career workflow tools."
+requires-python = ">=3.12,<3.13"
+
+[tool.uv.workspace]
+members = [
+  "apps/career-app",
+  "packages/cover-letter-engine",
+  "integrations/job-scout",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["apps/career-app"]
+markers = [
+  "integration: test that requires a real external service or private candidate collection",
+  "compile: test that requires a LaTeX compiler",
+]

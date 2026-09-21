@@ -1,0 +1,7 @@
+This repository includes a migrated Job Scout integration under
+`integrations/job-scout/`. Its upstream MIT license is retained at
+`integrations/job-scout/LICENSE`.
+
+No license has yet been selected for the Career Workspace code outside that
+integration. Do not redistribute those portions until the repository owner has
+chosen one.

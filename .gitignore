@@ -1,0 +1,31 @@
+# Local private candidate and operational data
+/private/*
+!/private/README.md
+/workspace.json
+.env
+.env.*
+!.env.example
+
+# Python and JavaScript environments/build products
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+dist/
+build/
+
+# Application artifacts and databases
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.pdf
+*.docx
+*.xlsx
+*.key
+*.pem
+
+# Editor / OS / local-agent history
+.DS_Store
+.aider.*
+.ipynb_checkpoints/

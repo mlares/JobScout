@@ -1,0 +1,29 @@
+<# Curriculum-inspired one-page cover letter. Dynamic text is always escaped. #>
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[scaled=0.96]{helvet}
+\usepackage{xcolor}
+\usepackage{parskip}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\definecolor{cvblue}{RGB}{52,113,177}
+\definecolor{cvgray}{RGB}{105,105,105}
+
+\begin{document}
+{\Large\bfseries\color{cvblue} << name | tex >>}\\[2pt]
+<% if headline %>{\color{cvgray} << headline | tex >>}\\<% endif %>
+<% if location %>{\small\color{cvgray} << location | tex >>}<% endif %>
+\vspace{18pt}
+
+<% for block in blocks %>
+<% if block.closing %>
+<% for line in block.lines %><< line | tex >><% if not loop.last %>\\[5pt]<% endif %>
+<% endfor %>
+<% else %>
+<< block.lines | join(' ') | tex >>
+<% endif %>
+
+<% endfor %>
+\end{document}

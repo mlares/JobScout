@@ -1,0 +1,30 @@
+[project]
+name = "career-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Career Workspace contributors" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.141.1",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+    "typesafe-sdk==0.7.0",
+    "uvicorn>=0.53.0",
+]
+
+[project.scripts]
+career-app = "career_app:main"
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pypdf>=6.19.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.8",
+]

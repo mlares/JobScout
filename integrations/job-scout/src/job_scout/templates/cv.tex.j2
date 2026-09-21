@@ -1,0 +1,57 @@
+<# Curriculum-inspired, ATS-readable single-column CV. All dynamic values use
+   the |tex escape filter; no LLM output is interpreted as LaTeX. #>
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.65cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[scaled=0.94]{helvet}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{parskip}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\definecolor{cvblue}{RGB}{52,113,177}
+\definecolor{cvgray}{RGB}{105,105,105}
+\setlist[itemize]{leftmargin=1.15em,itemsep=1.5pt,topsep=2pt,parsep=0pt}
+\newcommand{\sectionrule}[1]{\vspace{7pt}{\Large\bfseries\color{cvblue}#1}\par\vspace{-5pt}{\color{cvblue}\rule{\textwidth}{0.5pt}}\vspace{2pt}}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{cvblue} << name | tex >>}\hspace{5pt}{\color{cvgray}|}\hspace{5pt}
+{\Large\color{cvgray} << cv.headline | tex >>}\\[3pt]
+<% if location %>{\small\color{cvgray} << location | tex >>}<% endif %>
+\end{center}
+\vspace{6pt}
+
+<< cv.summary | tex >>
+
+<% if cv.experience %>
+\sectionrule{Professional Experience}
+<% for entry in cv.experience %>
+{\bfseries << entry.company | tex >>}\\[-1pt]
+{\itshape << entry.role | tex >>}<% if entry.dates %>\hfill{\itshape << entry.dates | tex >>}<% endif %>
+<% if entry.bullets %>
+\begin{itemize}
+<% for bullet in entry.bullets %>
+  \item << bullet.text | tex >>
+<% endfor %>
+\end{itemize}
+<% endif %>
+<% endfor %>
+<% endif %>
+
+<% if cv.skills %>
+\sectionrule{Core Expertise}
+<< cv.skills | map('tex') | join(' \\enspace\\textbullet\\enspace ') >>
+<% endif %>
+
+<% if cv.education %>
+\sectionrule{Education \& Additional Evidence}
+\begin{itemize}
+<% for line in cv.education %>
+  \item << line | tex >>
+<% endfor %>
+\end{itemize}
+<% endif %>
+
+\end{document}
