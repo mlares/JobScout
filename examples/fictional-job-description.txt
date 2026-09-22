@@ -1,0 +1,7 @@
+Northstar Transit Labs is hiring an Applied AI Engineer to build reliable
+decision-support tools for public-transport operations. The engineer will ship
+Python and FastAPI services, collaborate on React interfaces, evaluate model
+quality with reproducible datasets, and add monitoring for AI workflows.
+
+The role values practical machine-learning experience, clear communication,
+human-in-the-loop product design, SQL, and careful handling of sensitive data.

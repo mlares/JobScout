@@ -5,24 +5,25 @@ import hashlib
 import importlib.util
 import json
 import os
-from pathlib import Path
 import re
 import shutil
 import signal
 import sqlite3
-from datetime import date, datetime, timedelta, timezone
-from statistics import median
 import subprocess
 import sys
 import threading
-from uuid import uuid4, uuid5, NAMESPACE_URL
+from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
+from statistics import median
+from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from dotenv import dotenv_values
 
+from .jev import DEFAULT_MODEL as DEFAULT_JEV_MODEL
+from .jev import JevError
+from .jev import rank_families as rank_families_with_jev
 from .store import Store, now
-from .tracker_import import STATUSES, STAGES, TERMINAL_STATUSES, TrackerImporter
-from .jev import DEFAULT_MODEL as DEFAULT_JEV_MODEL, JevError, rank_families as rank_families_with_jev
-
+from .tracker_import import STAGES, STATUSES, TERMINAL_STATUSES, TrackerImporter
 
 MIN_SEMANTIC_SCORE = 55
 MIN_SEMANTIC_CONFIDENCE = .35
@@ -392,7 +393,6 @@ class CareerService:
                 self.stop.wait(.4)
 
     def call_bridge(self, request):
-        letter = request['kind'] in ('letter', 'letter-pdf')
         interpreter = Path(sys.executable)
         job_dir = self.contained(self.data / 'tasks' / request['task_id'])
         job_dir.mkdir(parents=True, exist_ok=True)
@@ -472,8 +472,8 @@ class CareerService:
         except ValueError as exc:
             raise ValueError(f'{field} must be an ISO date and time.') from exc
         if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed.astimezone(timezone.utc).isoformat()
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC).isoformat()
 
     def applications(self, status=None, stage=None, due=None, search=None):
         conditions, args = [], []
@@ -547,7 +547,7 @@ class CareerService:
                             f'{application["status"]} → {status}', 'manual', stamp))
             if status == 'submitted' and application['status'] != 'submitted':
                 self._insert_default_reminder(db, app_id, 'follow_up', 'Follow up',
-                                              datetime.now(timezone.utc) + timedelta(days=7), stamp)
+                                              datetime.now(UTC) + timedelta(days=7), stamp)
             if values['next_action'] and values['next_action_due_at']:
                 db.execute('''INSERT INTO reminders(id,application_id,reminder_type,title,due_at,status,created_at,updated_at)
                               VALUES (?,?,?,?,?,'open',?,?)''',
@@ -564,7 +564,7 @@ class CareerService:
         if not open_same:
             db.execute('''INSERT INTO reminders(id,application_id,event_id,reminder_type,title,due_at,status,created_at,updated_at)
                           VALUES (?,?,?,?,?,?,'open',?,?)''',
-                       (str(uuid4()), app_id, event_id, kind, title, due.astimezone(timezone.utc).isoformat(), stamp, stamp))
+                       (str(uuid4()), app_id, event_id, kind, title, due.astimezone(UTC).isoformat(), stamp, stamp))
 
     def add_event(self, app_id, fields):
         application = self.application(app_id)

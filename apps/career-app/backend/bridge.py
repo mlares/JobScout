@@ -5,15 +5,15 @@ accepted. This bridge never writes to the original tool repositories.
 """
 from __future__ import annotations
 
-from contextlib import redirect_stdout
 import hashlib
 import io
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
+from contextlib import redirect_stdout
+from pathlib import Path
 
 
 def main(request_path):
@@ -78,10 +78,9 @@ def main(request_path):
                 'source_sha256': hashlib.sha256((curriculum / family.source).read_bytes()).hexdigest()}
 
     if kind in ('letter', 'letter-pdf'):
-        from dotenv import load_dotenv
-        from cover_letters.profile import load_profile
         from cover_letters.generator import GenerationRequest, generate_letter, quality_warnings
-        tool = root / manifest['components']['cover_letters']['path']
+        from cover_letters.profile import load_profile
+        from dotenv import load_dotenv
         secret_path = root / manifest.get('secrets', {}).get('cover_letter', 'private/secrets/cover-letter.env')
         load_dotenv(secret_path, override=False)
         profile_path = root / manifest['paths']['profile']
@@ -108,9 +107,9 @@ def main(request_path):
         # Disable optional external tracing for this local app; source clients and
         # ranking still use the existing job agent configuration.
         os.environ['OPIK_ENABLED'] = 'false'
-        from job_scout.candidate_store import load_candidate, effective_profile
-        from job_scout.tools.jobs_api import run_search, filter_for_argentina, is_argentina_location
+        from job_scout.candidate_store import effective_profile, load_candidate
         from job_scout.runner import stream_search
+        from job_scout.tools.jobs_api import filter_for_argentina, is_argentina_location, run_search
         role = options.get('role', 'senior data scientist')
         location = options.get('location', 'Argentina')
         remote = options.get('remote', True)
@@ -119,7 +118,7 @@ def main(request_path):
         if options.get('ai_rank'):
             # The original wizard has a fixed role menu. Register a custom title
             # only in this isolated process so it is never silently substituted.
-            from job_scout.role_targets import ROLE_GUIDANCE, GENERAL_ROLE_GUIDANCE
+            from job_scout.role_targets import GENERAL_ROLE_GUIDANCE, ROLE_GUIDANCE
             ROLE_GUIDANCE.setdefault(role.strip().lower(), GENERAL_ROLE_GUIDANCE)
             candidate = load_candidate()
             if not candidate:

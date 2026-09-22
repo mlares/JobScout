@@ -21,16 +21,14 @@ repository merely because it is not named here.
 | `archive/` | Private historical archive | retain outside template | Contains migration history and prior private documents; never publish. |
 | root docs and `workspace.json` | Rewrite as generic docs/config | root + `workspace.example.json` | Existing files reveal names, paths, employer history, and personal resource locations. |
 
-## Known blockers before code migration
+## Completed migration controls
 
-- The current cover-letter profile is tracked in its existing repository and is
-  candidate-specific. A fresh public history, not a rename, is required.
-- The current Career App repository has source files untracked. Its reviewed
-  source can be migrated, but runtime data must remain excluded.
-- Several source files contained machine-specific paths. All migrated code now
-  obtains private paths from local configuration or environment variables.
-- Job Scout currently targets Python 3.12 while Career App and cover letters
-  target Python 3.14. The target repository will standardize on one supported
-  Python version after compatibility tests; no environment directories will be
-  copied.
-- License selection and third-party-notice review remain outstanding.
+- Candidate profiles, application records, runtime data, and generated output
+  are excluded through the ignored `private/` boundary.
+- Migrated components resolve paths through `workspace.json` and environment
+  variables rather than machine-specific absolute paths.
+- All Python components target Python 3.12 and share one locked environment.
+- Job Scout's upstream URL, revision, MIT license, and local modifications are
+  recorded in `NOTICE` and `docs/upstream.md`.
+- The root project is MIT licensed and CI runs tests, linting, a frontend build,
+  and the public-tree privacy gate.

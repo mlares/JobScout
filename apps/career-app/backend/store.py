@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from contextlib import contextmanager
-from datetime import datetime, timezone
 import json
-from pathlib import Path
 import sqlite3
-
+from contextlib import contextmanager
+from datetime import UTC, datetime
+from pathlib import Path
 
 SCHEMA_VERSION = 2
 
 
 def now():
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class Store:

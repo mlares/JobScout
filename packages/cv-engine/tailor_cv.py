@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 REPO_ROOT = Path(os.getenv("CV_REPOSITORY_PATH", Path(__file__).resolve().parents[1])).resolve()
 DEFAULT_MODEL = "gpt-5"
 API_URL = "https://api.openai.com/v1/responses"
@@ -127,10 +126,7 @@ def resolve_base(value: str | None, ranked: list[tuple[Family, float, list[str]]
 
 
 def read_job_description(path: str) -> str:
-    if path == "-":
-        content = sys.stdin.read()
-    else:
-        content = Path(path).read_text(encoding="utf-8")
+    content = sys.stdin.read() if path == "-" else Path(path).read_text(encoding="utf-8")
     if not content.strip():
         raise ValueError("The job description is empty")
     if len(content) > 80_000:

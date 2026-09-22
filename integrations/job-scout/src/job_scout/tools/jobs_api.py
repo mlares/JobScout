@@ -37,7 +37,10 @@ from job_scout.graph.schemas import JobPosting
 DESCRIPTION_LIMIT = 4000
 DEFAULT_LIMIT = 25
 DEFAULT_COUNTRY = "us"
-CACHE_PATH = Path(os.getenv("JOB_SCOUT_DATA_DIR", Path(__file__).resolve().parent.parent.parent.parent / "data")) / "cached_jobs.json"
+CACHE_PATH = (
+    Path(os.getenv("JOB_SCOUT_DATA_DIR", Path(__file__).resolve().parent.parent.parent.parent / "data"))
+    / "cached_jobs.json"
+)
 
 _COUNTRY_CODES: dict[str, str] = {
     "united states": "us", "usa": "us", "us": "us", "america": "us",

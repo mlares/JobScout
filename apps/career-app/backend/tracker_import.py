@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from collections import Counter
-from datetime import date, timedelta
 import hashlib
 import json
-from pathlib import Path
 import re
 import unicodedata
+import xml.etree.ElementTree as ET
+from collections import Counter
+from datetime import date, timedelta
+from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 from uuid import NAMESPACE_URL, uuid4, uuid5
-import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 from .store import now
-
 
 MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'

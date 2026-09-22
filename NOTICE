@@ -1,7 +1,10 @@
 This repository includes a migrated Job Scout integration under
-`integrations/job-scout/`. Its upstream MIT license is retained at
-`integrations/job-scout/LICENSE`.
+`integrations/job-scout/`. The upstream project is
+https://github.com/jamwithai/observable-job-agent (imported from revision
+`5839e4f`, before local privacy, workspace-path, and integration changes).
+Its upstream MIT license is retained at `integrations/job-scout/LICENSE`.
 
-No license has yet been selected for the Career Workspace code outside that
-integration. Do not redistribute those portions until the repository owner has
-chosen one.
+The Career Workspace code outside that integration is distributed under the
+root MIT license. Local changes to Job Scout include private-data isolation,
+workspace integration, additional job sources, CV and cover-letter generation,
+artifact handling, and evaluation coverage.

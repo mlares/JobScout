@@ -10,7 +10,6 @@ from uuid import uuid4
 
 import httpx
 import pytest
-
 from backend.app import create_app
 from backend.service import CareerService, sha
 from backend.store import Store

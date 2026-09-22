@@ -14,7 +14,6 @@ from .generator import (
 )
 from .profile import load_profile
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PROFILE = Path(os.getenv("CAREER_PROFILE_PATH", PROJECT_ROOT / "private/profile.json"))
 

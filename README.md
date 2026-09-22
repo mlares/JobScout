@@ -1,40 +1,83 @@
-# Career Workspace Template
+# Career Workspace
 
-Shareable, single-repository foundation for a local job-application workspace.
-It contains application software, reusable engines, integration boundaries, and
-synthetic examples. It deliberately contains no candidate profile, CV, job
-tracker, application documents, credentials, or runtime database.
+A privacy-first AI workbench for discovering roles, matching them to a candidate's evidence, and preparing truthful application materials.
 
-## Status
+The product combines a local React/FastAPI workspace with an observable job search agent, deterministic CV-family selection, evidence-grounded CV tailoring, and cover-letter generation. Candidate records, documents, credentials, and runtime databases stay outside Git under an ignored `private/` boundary.
 
-The Career App, cover-letter engine, and Job Scout integration source have been
-migrated without their environments, credentials, candidate records, or output.
-The candidate-specific collections reside under the ignored `private/` boundary.
-See [CLASSIFICATION.md](CLASSIFICATION.md) for the reviewed boundary.
+## Why this exists
 
-## Intended layout
+Job-search tools often optimize for generating more text. Career Workspace instead treats an application as a traceable workflow:
 
-```text
-apps/career-app/              Local UI and operational API
-packages/cover-letter-engine/ Generic cover-letter generation package
-packages/cv-engine/           Generic CV selection, tailoring, and build package
-integrations/job-scout/       Adapter or documented upstream dependency boundary
-examples/                     Synthetic, safe-to-publish fixtures
-private/                      Local-only candidate data; ignored except its README
+1. discover and rank relevant positions;
+2. explain why a role matches the candidate's evidence;
+3. select or tailor a CV without inventing claims;
+4. draft a cover letter from structured, approved facts;
+5. keep the candidate in control of review and submission.
+
+AI assists with search, ranking, and drafting. It never submits an application, and generated claims must pass deterministic checks and human review.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI[Career App<br/>React + FastAPI] --> Scout[Job Scout<br/>LangGraph + Opik]
+    UI --> CV[CV engine<br/>selection + validation]
+    UI --> Letter[Cover-letter engine]
+    Scout --> Providers[Job and model providers]
+    CV --> P[(private/)]
+    Letter --> P
+    UI --> P
 ```
 
-Copy `workspace.example.json` to a local, ignored `workspace.json` and point it
-at local private data before running any migrated software. Add secrets only to
-local `.env` files derived from `.env.example`.
+| Component | Responsibility |
+|---|---|
+| `apps/career-app/` | Local UI, API, application registry, workflow orchestration |
+| `integrations/job-scout/` | Multi-source discovery, ranking, tailoring, tracing, and evaluation |
+| `packages/cv-engine/` | Explainable CV-family selection and guarded LaTeX tailoring |
+| `packages/cover-letter-engine/` | Evidence-grounded letter generation and PDF rendering |
+| `notebooks/` | Reproducible walkthroughs of the agent and evaluation strategy |
+| `examples/` | Fictional, safe-to-publish demo inputs |
+| `private/` | Ignored candidate data, documents, secrets, and runtime state |
 
-## Local setup
+Job Scout is adapted from [jamwithai/observable-job-agent](https://github.com/jamwithai/observable-job-agent). See [NOTICE](NOTICE) and its retained [MIT license](integrations/job-scout/LICENSE).
 
-Use Python 3.12 for every Python component. From the repository root, install
-the shared environment with `uv sync --all-packages --all-groups`; install the
-Career App frontend with `npm ci --prefix apps/career-app`, then build it with
-`npm run build --prefix apps/career-app`. Copy `workspace.example.json` to
-`workspace.json`. The private data and secret files are local-only and ignored.
+## Quick start
 
-No license has been selected yet. Do not publish or redistribute this repository
-until a license is chosen and all imported third-party code has retained its
-required notices.
+Prerequisites: Python 3.12, [uv](https://docs.astral.sh/uv/), and Node.js 22.
+
+```bash
+cp workspace.example.json workspace.json
+cp .env.example .env
+make setup
+make check
+make run
+```
+
+Open <http://127.0.0.1:8765>. Add provider keys to `.env` only for live search or model-backed generation; local tests and the synthetic dry-run need no credentials.
+
+Run `make demo` to inspect a safe cover-letter prompt without making a model call. The demo uses a fictional candidate and employer from `examples/`.
+
+## Quality and evaluation
+
+The repository separates deterministic checks from model judgments:
+
+- schema validation and source attribution constrain generated artifacts;
+- CV tailoring rejects new includes, shell commands, and unsupported claims;
+- Job Scout records node- and provider-level traces;
+- hand-labeled datasets calibrate ranking and LLM-as-judge evaluations;
+- unit and integration tests run without personal data;
+- `make check-public` rejects tracked private paths, credentials, and common local-path leaks.
+
+Run the local quality gate with `make check`. Networked and compiler-dependent tests are marked separately and excluded from the default CI job.
+
+## Private-data contract
+
+`workspace.example.json` documents the expected local layout. The real `workspace.json`, `.env` files, generated documents, databases, and everything under `private/`—except its explanatory README—are ignored.
+
+Never put a real CV, profile, job tracker, application, email address, API key, or generated submission in `examples/`. Run `make check-public` before pushing.
+
+## Project status
+
+This is a working portfolio project, not an automated hiring or submission service. The local application and engines are functional; live provider paths require user-supplied credentials. See the component READMEs and notebooks for implementation details and evaluation findings.
+
+Licensed under the [MIT License](LICENSE). Third-party attribution is recorded in [NOTICE](NOTICE).

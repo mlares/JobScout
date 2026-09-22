@@ -5,7 +5,6 @@ from typing import Any, Protocol
 
 from .profile import CandidateProfile
 
-
 SYSTEM_INSTRUCTIONS = """You write tailored, truthful cover letters.
 
 Grounding is the highest-priority requirement:

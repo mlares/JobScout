@@ -7,9 +7,9 @@ name is documented in ``.env.example``.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
-import os
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -35,7 +35,10 @@ class Settings(BaseSettings):
 
     openai_api_key: SecretStr = Field(default=SecretStr(""), alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-5", alias="OPENAI_MODEL")
-    cv_repository_path: Path = Field(default=Path(os.getenv("CAREER_PRIVATE_ROOT", "private")) / "curriculum", alias="CV_REPOSITORY_PATH")
+    cv_repository_path: Path = Field(
+        default=Path(os.getenv("CAREER_PRIVATE_ROOT", "private")) / "curriculum",
+        alias="CV_REPOSITORY_PATH",
+    )
     cv_generation_timeout_seconds: int = Field(default=420, alias="CV_GENERATION_TIMEOUT_SECONDS", ge=181, le=1800)
 
     opik_api_key: SecretStr = Field(default=SecretStr(""), alias="OPIK_API_KEY")

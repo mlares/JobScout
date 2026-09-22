@@ -17,7 +17,6 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 from .profile import CandidateProfile
 
-
 NAVY = colors.HexColor("#102A43")
 BLUE = colors.HexColor("#2F80ED")
 INK = colors.HexColor("#243B53")

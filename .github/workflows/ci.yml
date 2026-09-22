@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --all-packages --all-groups
+      - run: uv run --all-packages ruff check apps packages integrations scripts
+      - run: uv run --all-packages pytest apps/career-app/tests packages/cover-letter-engine/tests packages/cv-engine/tests integrations/job-scout/tests -m "not integration and not compile"
+      - run: uv run python scripts/check_public_tree.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/career-app/package-lock.json
+      - run: npm ci --prefix apps/career-app
+      - run: npm run build --prefix apps/career-app
