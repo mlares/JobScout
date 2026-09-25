@@ -1,6 +1,7 @@
 # Local private candidate and operational data
 /private/*
 !/private/README.md
+/.demo_runtime/
 /workspace.json
 .env
 .env.*
@@ -24,6 +25,12 @@ build/
 *.xlsx
 *.key
 *.pem
+
+# Only the reviewed, fictional CV previews are distributable PDFs.
+!/private_example/curriculum/dist/
+!/private_example/curriculum/dist/short/
+!/private_example/curriculum/dist/short/*/
+!/private_example/curriculum/dist/short/*/*.pdf
 
 # Editor / OS / local-agent history
 .DS_Store

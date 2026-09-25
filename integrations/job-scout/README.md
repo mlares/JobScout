@@ -7,8 +7,16 @@ This integration is adapted from [jamwithai/observable-job-agent](https://github
 The root Career App is the supported product entry point. To work on Job Scout directly:
 
 ```bash
+uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 uv run pytest integrations/job-scout/tests -m "not integration and not compile"
 uv run ruff check integrations/job-scout
 ```
+
+The fixture generation is currently needed on a fresh checkout. See the workspace
+[configuration guide](../../docs/configuration.md#job-scout-and-cv-tailoring) for
+provider keys and the [AI-ranking setup](../../docs/usage.md#optional-ai-job-ranking)
+for launching the standalone wizard with private candidate storage. The main app
+and wizard use a saved Job Scout candidate that is separate from the cover-letter
+profile. No offline job cache is included in the public tree.
 
 The phase notebooks and `docs/` explain the tracing and evaluation design.

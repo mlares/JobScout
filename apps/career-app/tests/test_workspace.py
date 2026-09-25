@@ -7,6 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
+from xml.sax.saxutils import escape
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import httpx
 import pytest
@@ -33,19 +35,11 @@ def service(tmp_path, monkeypatch):
         monkeypatch.delenv(key, raising=False)
     root = tmp_path / 'career'
     root.mkdir()
-    manifest = json.loads((WORKSPACE / 'workspace.json').read_text())
+    manifest = json.loads((WORKSPACE / 'workspace.demo.json').read_text())
     (root / 'workspace.json').write_text(json.dumps(manifest))
-    curriculum = Path(manifest['paths']['curriculum'])
-    (root / curriculum / 'scripts').mkdir(parents=True)
-    shutil.copy2(WORKSPACE / curriculum / 'scripts/tailor_cv.py', root / curriculum / 'scripts/tailor_cv.py')
-    for source in (WORKSPACE / curriculum / 'cv/short').glob('*/*.tex'):
-        target = root / source.relative_to(WORKSPACE)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
-    for pdf in (WORKSPACE / curriculum / 'dist/short').glob('*/*.pdf'):
-        target = root / pdf.relative_to(WORKSPACE)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(pdf, target)
+    curriculum = WORKSPACE / manifest['paths']['curriculum']
+    shutil.copytree(curriculum, root / manifest['paths']['curriculum'],
+                    ignore=shutil.ignore_patterns('build', '__pycache__', '*.pyc'))
     profile = root / manifest['paths']['profile']
     profile.parent.mkdir(parents=True, exist_ok=True)
     profile.write_text(json.dumps({
@@ -337,6 +331,22 @@ def test_real_bridge_copy_uses_original_pdf_without_ai(service, app_record):
     assert sha(path) == sha(service.family_pdf('ml-engineering'))
 
 
+def test_demo_flag_ignores_personal_config_and_uses_example_inputs(service, app_record, monkeypatch):
+    root = service.root
+    shutil.copy2(WORKSPACE / 'workspace.demo.json', root / 'workspace.demo.json')
+    (root / 'workspace.json').write_text('personal config is not used in demo mode')
+    monkeypatch.setenv('CAREER_DEMO', '1')
+
+    demo = CareerService(root=root)
+    demo.scout = WORKSPACE / 'integrations/job-scout'
+    assert demo.private == root / '.demo_runtime'
+    assert demo.curriculum == root / 'private_example/curriculum'
+    task = demo.enqueue('copy', app_record['id'], {'family': 'ml-engineering'}, str(uuid4()))
+    demo.run_task(task['id'])
+    assert demo.store.task(task['id'])['status'] == 'completed'
+    assert not (root / 'private').exists()
+
+
 def test_real_cover_letter_renderer_with_edited_text(service, app_record):
     service.letters = WORKSPACE / 'packages/cover-letter-engine'
     task = service.enqueue('letter-pdf', app_record['id'], {'letter': 'Dear hiring team,\n\nThis is an offline PDF rendering check.\n\nExample Candidate'}, str(uuid4()))
@@ -351,9 +361,6 @@ def test_real_cover_letter_renderer_with_edited_text(service, app_record):
 
 @pytest.mark.skipif(not shutil.which('pdflatex'), reason='LaTeX is not installed')
 def test_real_rebuild_is_isolated_and_keeps_original_family_pdf(service, app_record):
-    for relative in ('scripts', 'content', 'evidence', 'references', 'vendor', 'assets', 'docs', 'cv/long'):
-        shutil.copytree(WORKSPACE / 'private/curriculum' / relative, service.curriculum / relative,
-                        dirs_exist_ok=True, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
     original = service.family_pdf('ml-engineering')
     before = sha(original)
     service.scout = WORKSPACE / 'integrations/job-scout'
@@ -499,15 +506,50 @@ def test_tracking_api_contract(service, app_record):
 
 def test_excel_tracker_import_preview_commit_and_repeat(service):
     tracker = service.root / service.manifest['paths']['tracker']
-    shutil.copy2(WORKSPACE / service.manifest['paths']['tracker'], tracker)
+    headers = ('Company', 'Role', 'Post', 'Status', 'Applied', 'Application date', 'HR init', 'Last news')
+    records = (
+        ('Northstar Transit Labs', 'ML Engineer', 'https://example.com/job/1', 'Presented', 'Yes', '2026-01-10', '', ''),
+        ('Meridian Analytics', 'Data Scientist', 'https://example.com/job/2', 'Pending Interview', 'Yes', '2026-02-01', '2099-01-15', ''),
+        ('Quartz Research', 'Research Scientist', 'https://example.com/job/3', 'Rejected', 'Yes', '2026-03-01', '', '2026-03-21'),
+    )
+
+    def row_xml(number, values):
+        cells = ''.join(f'<c r="{chr(65 + index)}{number}" t="inlineStr"><is><t>{escape(value)}</t></is></c>'
+                        for index, value in enumerate(values))
+        return f'<row r="{number}">{cells}</row>'
+
+    rows = row_xml(1, headers) + ''.join(row_xml(index, values) for index, values in enumerate(records, 2))
+    with ZipFile(tracker, 'w', compression=ZIP_DEFLATED) as workbook:
+        workbook.writestr('[Content_Types].xml',
+                          '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+                          '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+                          '<Default Extension="xml" ContentType="application/xml"/>'
+                          '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+                          '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+                          '</Types>')
+        workbook.writestr('_rels/.rels',
+                          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                          '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+                          '</Relationships>')
+        workbook.writestr('xl/workbook.xml',
+                          '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+                          'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                          '<sheets><sheet name="apply" sheetId="1" r:id="rId1"/></sheets></workbook>')
+        workbook.writestr('xl/_rels/workbook.xml.rels',
+                          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                          '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+                          '</Relationships>')
+        workbook.writestr('xl/worksheets/sheet1.xml',
+                          '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+                          f'<sheetData>{rows}</sheetData></worksheet>')
     preview = service.import_tracker(False)
-    assert preview['total'] == 172
-    assert preview['summary']['create'] == 172
+    assert preview['total'] == 3
+    assert preview['summary']['create'] == 3
 
     result = service.import_tracker(True)
-    assert result['created'] == 172 and result['linked'] == 0
-    assert service.store.one('SELECT COUNT(*) AS count FROM import_rows')['count'] == 172
-    assert service.store.one("SELECT COUNT(*) AS count FROM applications WHERE import_source='JobSearch.xlsx'")['count'] == 172
+    assert result['created'] == 3 and result['linked'] == 0
+    assert service.store.one('SELECT COUNT(*) AS count FROM import_rows')['count'] == 3
+    assert service.store.one("SELECT COUNT(*) AS count FROM applications WHERE import_source='JobSearch.xlsx'")['count'] == 3
     repeated = service.import_tracker(True)
     assert repeated['already_imported'] is True
     assert service.store.one('SELECT COUNT(*) AS count FROM import_batches')['count'] == 1
@@ -517,6 +559,6 @@ def test_excel_tracker_import_preview_commit_and_repeat(service):
     # with the same source rows and verifies reconciliation rather than duplication.
     tracker.write_bytes(tracker.read_bytes() + b'\n')
     revised = service.import_tracker(True)
-    assert revised['linked'] == 172 and revised['created'] == 0
+    assert revised['linked'] == 3 and revised['created'] == 0
     assert service.store.one('SELECT COUNT(*) AS count FROM import_batches')['count'] == 2
     assert service.store.one('SELECT COUNT(*) AS count FROM application_events WHERE source="JobSearch.xlsx"')['count'] == imported_events

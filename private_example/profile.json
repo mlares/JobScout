@@ -1,0 +1,19 @@
+{
+  "name": "John Doe",
+  "location": "Rosario, Argentina",
+  "headline": "Machine learning engineer building reliable decision-support systems",
+  "links": [
+    {"label": "Portfolio assistant", "url": "https://example.com/john-doe-assistant"}
+  ],
+  "facts": [
+    {"category": "work", "statement": "Worked as an ML engineer at fictional Northstar Transit Labs from 2022 onward, building a monitored document-classification service with human review and reproducible evaluation datasets."},
+    {"category": "work", "statement": "Reduced manual triage time by 35% in a fictional internal pilot while preserving reviewer approval."},
+    {"category": "work", "statement": "Built a retrieval assistant with source citations and an evaluation set for a fictional internal knowledge base."},
+    {"category": "work", "statement": "Worked as a data scientist at fictional Meridian Analytics from 2018 to 2022, using Python and SQL for forecasting, experiment analysis, and dashboards."},
+    {"category": "leadership", "statement": "Coordinated a small cross-functional working group and mentored junior analysts at fictional Meridian Analytics."},
+    {"category": "research", "statement": "Completed an independent research project at fictional Example University from 2017 to 2018, evaluating uncertainty in image classification on a synthetic dataset and sharing reproducible notebooks internally; this was not a peer-reviewed publication."},
+    {"category": "skills", "statement": "Uses Python, FastAPI, React, SQL, PyTorch, model evaluation, and production observability."},
+    {"category": "education", "statement": "Earned a fictional BSc in Computer Science from Example University in 2017."}
+  ],
+  "preferences": {"target_words": 300}
+}

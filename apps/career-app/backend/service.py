@@ -42,7 +42,9 @@ def slug(value):
 class CareerService:
     def __init__(self, root=None, data=None):
         self.root = Path(root or os.getenv('CAREER_WORKSPACE_ROOT') or Path(__file__).resolve().parents[3]).resolve()
-        self.manifest = json.loads((self.root / 'workspace.json').read_text())
+        manifest_name = 'workspace.demo.json' if os.getenv('CAREER_DEMO') == '1' else 'workspace.json'
+        self.manifest_path = self.root / manifest_name
+        self.manifest = json.loads(self.manifest_path.read_text())
         self.private = (self.root / self.manifest.get('private_root', 'private')).resolve()
         self.secrets = self.manifest.get('secrets', {})
         self.data = Path(data or os.getenv('CAREER_DATA_DIR') or self.private / 'career-app/data').resolve()
@@ -57,7 +59,10 @@ class CareerService:
         self.app_root = self.root / self.manifest['components']['career_app']['path']
         self.scout = self.root / self.manifest['components']['job_scout']['path']
         self.letters = self.root / self.manifest['components']['cover_letters']['path']
-        spec = importlib.util.spec_from_file_location('career_cv_selector_' + uuid4().hex, self.curriculum / 'scripts/tailor_cv.py')
+        selector_path = self.curriculum / 'scripts/tailor_cv.py'
+        if not selector_path.is_file():
+            selector_path = self.root / 'packages/cv-engine/tailor_cv.py'
+        spec = importlib.util.spec_from_file_location('career_cv_selector_' + uuid4().hex, selector_path)
         self.selector = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = self.selector
         spec.loader.exec_module(self.selector)
@@ -215,7 +220,9 @@ class CareerService:
             metadata = {'schema_version': 1, 'id': app_id, 'company': fields['company'], 'role': fields['role'],
                         'status': None, 'applied_at': None, 'source_url': fields['source_url'],
                         'job_description': 'job-description.txt', 'cv_source': None, 'artifacts': [],
-                        'managed_by': 'career-app', 'artifact_registry': 'private/career-app/data/career.sqlite3'}
+                        'managed_by': 'career-app',
+                        'artifact_registry': str(self.store.path.relative_to(self.root)
+                                                 if self.store.path.is_relative_to(self.root) else self.store.path)}
             (folder / 'application.json').write_text(json.dumps(metadata, indent=2) + '\n')
         return self.application(app_id)
 
@@ -394,6 +401,7 @@ class CareerService:
 
     def call_bridge(self, request):
         interpreter = Path(sys.executable)
+        request['manifest_path'] = str(self.manifest_path)
         job_dir = self.contained(self.data / 'tasks' / request['task_id'])
         job_dir.mkdir(parents=True, exist_ok=True)
         path = job_dir / 'request.json'

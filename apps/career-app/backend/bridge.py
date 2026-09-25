@@ -21,7 +21,8 @@ def main(request_path):
     root = Path(request['root'])
     output = Path(request['output'])
     output.mkdir(parents=True, exist_ok=True)
-    manifest = json.loads((root / 'workspace.json').read_text())
+    manifest_path = request.get('manifest_path') or root / ('workspace.demo.json' if os.getenv('CAREER_DEMO') == '1' else 'workspace.json')
+    manifest = json.loads(Path(manifest_path).read_text())
     curriculum = root / manifest['paths']['curriculum']
     kind = request['kind']
     app = request.get('application', {})
@@ -52,9 +53,18 @@ def main(request_path):
         # Isolate both LaTeX build output and application sources per task.
         isolated = output / 'curriculum'
         for relative in ('scripts', 'content', 'evidence', 'references', 'vendor', 'assets', 'docs', 'cv/short', 'cv/long'):
-            shutil.copytree(curriculum / relative, isolated / relative,
-                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), dirs_exist_ok=True)
+            source = curriculum / relative
+            if source.is_dir():
+                shutil.copytree(source, isolated / relative,
+                                ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), dirs_exist_ok=True)
+        scripts = isolated / 'scripts'
+        scripts.mkdir(parents=True, exist_ok=True)
+        for name in ('tailor_cv.py', 'build_cv.sh'):
+            target = scripts / name
+            if not target.is_file():
+                shutil.copy2(root / 'packages/cv-engine' / name, target)
         env = os.environ.copy()
+        env['CV_REPOSITORY_PATH'] = str(isolated)
         env['OPENAI_API_KEY'] = settings.openai_api_key.get_secret_value() if kind == 'cv' else ''
         env['OPENAI_MODEL'] = settings.openai_model
         if kind == 'cv':

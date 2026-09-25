@@ -14,3 +14,10 @@ uv run cover-letter generate \
   --role "Applied AI Engineer" \
   --dry-run
 ```
+
+For personal use, see [provider configuration](../../docs/configuration.md#cover-letters)
+and the [CLI guide](../../docs/usage.md#cover-letter-command-line). The standalone
+CLI needs an explicit `--profile` and, when using the workspace's secrets file,
+`CAREER_COVER_LETTER_ENV=private/secrets/cover-letter.env`. It does not select them
+through `workspace.json`. PDF output needs a real assistant/chat URL in the
+profile for its QR code, but does not require LaTeX.

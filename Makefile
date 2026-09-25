@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup test lint build check-public check demo run
+.PHONY: help setup test lint build check-public check demo run run-demo
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -28,3 +28,6 @@ demo: ## Print a synthetic cover-letter prompt without a model call
 
 run: ## Launch the local Career App on http://127.0.0.1:8765
 	bash apps/career-app/run.sh
+
+run-demo: ## Launch with fictional inputs and isolated demo runtime data
+	CAREER_DEMO=1 bash apps/career-app/run.sh
