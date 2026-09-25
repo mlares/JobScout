@@ -1,18 +1,19 @@
 # Contributing
 
 Use Python 3.12 and Node.js 22.12 or newer within Node 22. Run `make setup` once.
-On a fresh checkout, the current test suite requires generating synthetic PDF
-fixtures before the quality gate:
+The four small, synthetic CV-reader fixture PDFs are committed in
+`integrations/job-scout/data/fixture_cvs/`, so a fresh checkout can run the full
+default quality gate directly:
 
 ```bash
-uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 make check
 ```
 
-Run these commands from the repository root before opening a pull request. See
+Run this command from the repository root before opening a pull request. See
 [Setup](docs/setup.md) and [Usage](docs/usage.md#development-servers) for installation
-and development-server instructions. The fixture generation is a workaround;
-it is not yet part of the root setup or CI workflow.
+and development-server instructions. Regenerate the fixtures only when
+intentionally updating these reviewed examples, using
+`uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py`.
 
 Keep changes within the component boundaries documented in the root README.
 Tests and examples must use fictional people, employers, contact details, and

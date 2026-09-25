@@ -97,17 +97,17 @@ or install dependencies merely for a documentation-only task.
   task output containment, and absence of reads/writes to personal inputs using
   temporary synthetic fixtures.
 
-Before default tests on a fresh checkout, check whether the synthetic CV-reader
-PDF fixtures exist. If still absent, generate them with the existing helper:
+The four synthetic CV-reader PDFs are committed in
+`integrations/job-scout/data/fixture_cvs/`; fresh checkouts can run `make check`
+without generating test data. If intentionally updating those reviewed fixtures,
+use the existing helper and inspect the resulting public PDFs:
 
 ```bash
 uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
-make check
 ```
 
-Do not count this manual workaround as proof that unmodified clean-checkout CI
-passes. `make check` excludes `integration` and `compile` tests. Report exclusions
-and untested live-provider paths; do not freeze a historical passing-test count.
+`make check` excludes `integration` and `compile` tests. Report exclusions and
+untested live-provider paths; do not freeze a historical passing-test count.
 
 Run `make check-public` and `git diff --check` for public-file edits. The former
 checks selected paths and patterns, not all secrets or history. For cache permission

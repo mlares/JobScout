@@ -92,14 +92,18 @@ The repository separates deterministic checks from model judgments:
 - the default deterministic test suite uses fictional data;
 - `make check-public` rejects tracked private paths and selected secret/local-path patterns; it is not a full secret or history scan.
 
-Before running the local quality gate on a fresh checkout, generate the currently missing synthetic PDF test fixtures:
+Four small synthetic CV-reader PDFs are committed under
+`integrations/job-scout/data/fixture_cvs/`. From a fresh checkout, run the quality
+gate directly:
 
 ```bash
-uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 make check
 ```
 
-This is a documented workaround, not an automatic setup or CI step. Networked and compiler-dependent tests are marked separately and excluded from the default CI job.
+Regenerate the examples with
+`uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py`
+only when intentionally updating the committed fixtures. Networked and
+compiler-dependent tests are marked separately and excluded from the default CI job.
 
 ## Private-data contract
 

@@ -18,6 +18,10 @@ ALLOWED_EXAMPLE_PDFS = {
     'private_example/curriculum/dist/short/technical-leadership/CV_technical_leadership.pdf',
     'private_example/curriculum/dist/short/analytics-decision-science/CV_analytics_decision_science.pdf',
     'private_example/curriculum/dist/short/research-scientific-ml/CV_research_scientific_ml.pdf',
+    'integrations/job-scout/data/fixture_cvs/junior_ds_us.pdf',
+    'integrations/job-scout/data/fixture_cvs/senior_mle_eu.pdf',
+    'integrations/job-scout/data/fixture_cvs/career_changer_in.pdf',
+    'integrations/job-scout/data/fixture_cvs/german_pm_de.pdf',
 }
 TEXT_SUFFIXES = {
     "",

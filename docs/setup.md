@@ -113,22 +113,22 @@ a model, or produce a finished cover letter.
 
 ## Run the checks
 
-There is a current fresh-clone limitation: four synthetic PDF fixtures required
-by the CV-reader tests are ignored and not distributed. Generate them first:
+Four fictional CV-reader test PDFs are included in the repository at
+`integrations/job-scout/data/fixture_cvs/`. A fresh checkout needs no fixture
+generation; run the quality gate directly:
 
 ```bash
-uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 make check
 ```
 
-These are fictional test CVs, not personal documents. This manual generation step
-is a workaround; the root setup and CI commands do not yet perform it for you.
+If you deliberately update these public synthetic examples, regenerate them with
+`uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py`,
+review the PDF contents, and include the resulting changes in your commit.
 
 `make check` runs lint, deterministic tests, the frontend build, and the
 public-tree check. Tests marked `integration` or `compile` are excluded, so a
 passing result does not validate live credentials or every LaTeX path. See
-[troubleshooting](troubleshooting.md#missing-test-fixtures) for the expected failure
-when the fixtures are absent.
+[troubleshooting](troubleshooting.md) for known limitations.
 
 ## Next: personal configuration
 

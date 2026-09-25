@@ -16,4 +16,4 @@ Open <http://127.0.0.1:8765>. After configuring personal data, use `env -u CAREE
 
 See [Setup](../../docs/setup.md), [Configuration](../../docs/configuration.md), [Usage](../../docs/usage.md), and [Troubleshooting](../../docs/troubleshooting.md) for complete instructions, provider configuration, and development servers.
 
-Backend tests live in `tests/test_workspace.py`. The frontend production build is part of `make check` and CI. The full test suite currently needs the documented [synthetic-fixture generation step](../../docs/troubleshooting.md#missing-test-fixtures) on a fresh checkout.
+Backend tests live in `tests/test_workspace.py`. The frontend production build is part of `make check` and CI. Four synthetic CV-reader fixture PDFs are committed for fresh-checkout tests; see [Setup](../../docs/setup.md#run-the-checks).

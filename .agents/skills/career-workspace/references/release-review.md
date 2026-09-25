@@ -30,9 +30,9 @@ directory, which may contain ignored dependencies, CVs, and configuration.
 - Attempt the documented dependency installation and test/build commands when
   authorized and feasible. Note cache reuse, unavailable network access, and
   skipped checks. Never use live credentials to make an offline smoke test pass.
-- Record a missing-fixture failure before applying a diagnostic workaround in the
-  temporary copy. If generating synthetic fixtures fixes tests, that does not
-  mean the distributed setup or CI already performs that generation.
+- The four small synthetic CV-reader PDF fixtures are committed and explicitly
+  allowlisted. Confirm a fresh public snapshot contains exactly those fixtures;
+  do not treat local ignored generator output as evidence that checkout CI has them.
 - Smoke-test fictional bootstrap, six PDF previews, explicit keyword selection,
   and copy/download when relevant. Check that output stays in the intended
   temporary runtime. Do not silently fall back to the real personal manifest.

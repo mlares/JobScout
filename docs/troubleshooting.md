@@ -34,26 +34,21 @@ Restart the backend after configuration changes. If a worker reports that anothe
 instance owns the workspace, stop that instance cleanly; do not delete an active
 database or worker lock to force startup.
 
-## Missing test fixtures
+## CV-reader test fixtures
 
-A clean public checkout currently lacks these ignored synthetic PDFs under
-`integrations/job-scout/data/fixture_cvs/`:
-
-- `junior_ds_us.pdf`
-- `senior_mle_eu.pdf`
-- `career_changer_in.pdf`
-- `german_pm_de.pdf`
-
-This causes five CV-reader test failures. Generate them before running the suite:
+The four CV-reader PDFs are synthetic and committed under
+`integrations/job-scout/data/fixture_cvs/`. They are covered by the public-tree
+PDF allowlist and are the only PDFs allowed in that fixture directory. Fresh
+checkouts and CI get them directly; no setup step is needed. If a local checkout
+is missing one, restore the reviewed version from Git. To intentionally regenerate
+all four after editing their source generator, run:
 
 ```bash
 uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
-make check
 ```
 
-The generator contains fictional data. This workaround does not repair the CI
-configuration: fresh CI needs an equivalent generation step or reviewed,
-explicitly distributed fixtures. Do not solve it by adding real CVs.
+Review text, metadata, and changes before committing generated fixture PDFs. Do
+not replace them with real candidate documents.
 
 ## Demo mode is not a sandbox
 

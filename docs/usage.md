@@ -183,11 +183,14 @@ Use `make help` for the command list. After pulling dependency changes, run
 `make setup` and rebuild. Before publishing:
 
 ```bash
-uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 make check
 git status --short
 git diff --check
 ```
+
+The four fictional CV-reader test PDFs are committed, so `make check` runs from a
+fresh checkout without generating fixtures. The existing generator is only for
+intentional updates to those checked-in examples.
 
 `make check-public` can also be run separately. It checks tracked and unignored
 files for selected patterns and paths, not all secret types or Git history.

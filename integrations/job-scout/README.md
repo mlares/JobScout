@@ -7,12 +7,15 @@ This integration is adapted from [jamwithai/observable-job-agent](https://github
 The root Career App is the supported product entry point. To work on Job Scout directly:
 
 ```bash
-uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py
 uv run pytest integrations/job-scout/tests -m "not integration and not compile"
 uv run ruff check integrations/job-scout
 ```
 
-The fixture generation is currently needed on a fresh checkout. See the workspace
+The four fictional CV-reader fixture PDFs are committed under
+`integrations/job-scout/data/fixture_cvs/`, so tests run from a fresh checkout.
+Regenerate them with `uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py`
+only when intentionally changing the examples, and review the resulting PDFs
+before committing them. See the workspace
 [configuration guide](../../docs/configuration.md#job-scout-and-cv-tailoring) for
 provider keys and the [AI-ranking setup](../../docs/usage.md#optional-ai-job-ranking)
 for launching the standalone wizard with private candidate storage. The main app
