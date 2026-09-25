@@ -1,6 +1,6 @@
 # Career Workspace
 
-A privacy-first AI workbench for discovering roles, matching them to a candidate's evidence, and preparing truthful application materials.
+A local-first AI workbench for discovering roles, matching them to a candidate's evidence, and preparing application drafts for human review.
 
 The product combines a local React/FastAPI workspace with an observable job search agent, deterministic CV-family selection, evidence-grounded CV tailoring, and cover-letter generation. Candidate records, documents, credentials, and runtime databases stay outside Git under an ignored `private/` boundary.
 
@@ -14,7 +14,7 @@ Job-search tools often optimize for generating more text. Career Workspace inste
 4. draft a cover letter from structured, approved facts;
 5. keep the candidate in control of review and submission.
 
-AI assists with search, ranking, and drafting. It never submits an application, and generated claims must pass deterministic checks and human review.
+AI assists with search, ranking, and drafting. It never submits an application. Deterministic checks catch selected problems; they do not certify factual accuracy, so human review remains essential.
 
 ## Architecture
 
@@ -36,48 +36,83 @@ flowchart LR
 | `packages/cv-engine/` | Explainable CV-family selection and guarded LaTeX tailoring |
 | `packages/cover-letter-engine/` | Evidence-grounded letter generation and PDF rendering |
 | `notebooks/` | Reproducible walkthroughs of the agent and evaluation strategy |
-| `examples/` | Fictional, safe-to-publish demo inputs |
+| `examples/` | Fictional job description and prompt-only demo inputs |
+| `private_example/` | Fictional CV family, prebuilt PDF previews, and profile for the local app demo |
 | `private/` | Ignored candidate data, documents, secrets, and runtime state |
 
 Job Scout is adapted from [jamwithai/observable-job-agent](https://github.com/jamwithai/observable-job-agent). See [NOTICE](NOTICE) and its retained [MIT license](integrations/job-scout/LICENSE).
 
-## Quick start
+## Quick start: fictional local demo
 
-Prerequisites: Python 3.12, [uv](https://docs.astral.sh/uv/), and Node.js 22.
+Prerequisites: Git, Make, Python 3.12, [uv](https://docs.astral.sh/uv/), and Node.js 22.12 or newer within Node 22. These instructions use Linux/Bash.
 
 ```bash
-cp workspace.example.json workspace.json
-cp .env.example .env
 make setup
-make check
-make run
+make build
+env -u CAREER_DATA_DIR make run-demo
 ```
 
-Open <http://127.0.0.1:8765>. Add provider keys to `.env` only for live search or model-backed generation; local tests and the synthetic dry-run need no credentials.
+Open <http://127.0.0.1:8765>. John Doe's six example CV PDFs are ready to preview and copy. Keyword CV matching and application tracking work without credentials or LaTeX. Search attempts live sources; no offline job cache is shipped. Model-backed features need provider configuration and send relevant content to external providers.
 
-Run `make demo` to inspect a safe cover-letter prompt without making a model call. The demo uses a fictional candidate and employer from `examples/`.
+`make run-demo` selects `workspace.demo.json` without changing `workspace.json`. The command above clears an inherited database override so records use the default ignored `.demo_runtime/` directory. Demo mode does not disable inherited credentials or network access. The equivalent flag is `env -u CAREER_DATA_DIR CAREER_DEMO=1 make run`.
+
+Run `make demo` to inspect a safe cover-letter prompt without making a model call. See [private_example/README.md](private_example/README.md) for the app demo and LaTeX rebuild instructions.
+
+For your own data, copy `workspace.example.json` to `workspace.json`, put your profile and CV sources under `private/`, and configure their paths. The current CV tailoring and rebuild path uses LaTeX; the prebuilt example PDFs make it optional for trying the app.
+
+The main API has no user authentication and must remain local. Model-generated LaTeX compilation is not securely sandboxed; leave that feature unused on machines with sensitive files until isolation is implemented. See [Security](SECURITY.md).
+
+## Documentation
+
+- [Setup and first run](docs/setup.md): prerequisites, installation, John Doe demo, and verification.
+- [Configuration](docs/configuration.md): personal data, CV families, LaTeX, secrets files, and environment precedence.
+- [Usage](docs/usage.md): daily workflow, AI-ranking setup, tracker import, CLI tools, and development servers.
+- [Troubleshooting](docs/troubleshooting.md): common errors, fresh-clone test fixtures, and known safety limitations.
+
+## Project skill for Codex
+
+The repository includes a [Career Workspace skill](.agents/skills/career-workspace/SKILL.md) for project-specific development, configuration, testing, documentation, and reviews. It routes agents to the existing guides and keeps public fixtures, personal inputs, and provider-backed actions separate.
+
+For example:
+
+```text
+Use $career-workspace to review publication readiness without modifying personal data.
+```
+
+It lives in repository-scoped `.agents/skills/`, following [Codex's skill discovery conventions](https://learn.chatgpt.com/docs/build-skills#where-to-save-skills). It supports explicit and automatic selection; if it does not appear after creation, restart Codex. The skill is guidance, not a fix for the application's documented security limitations.
 
 ## Quality and evaluation
 
 The repository separates deterministic checks from model judgments:
 
 - schema validation and source attribution constrain generated artifacts;
-- CV tailoring rejects new includes, shell commands, and unsupported claims;
-- Job Scout records node- and provider-level traces;
+- CV tailoring checks selected include/command patterns and known unsupported claims, but is not a security sandbox;
+- standalone Job Scout can record node- and provider-level traces when configured;
 - hand-labeled datasets calibrate ranking and LLM-as-judge evaluations;
-- unit and integration tests run without personal data;
-- `make check-public` rejects tracked private paths, credentials, and common local-path leaks.
+- the default deterministic test suite uses fictional data;
+- `make check-public` rejects tracked private paths and selected secret/local-path patterns; it is not a full secret or history scan.
 
-Run the local quality gate with `make check`. Networked and compiler-dependent tests are marked separately and excluded from the default CI job.
+Four small synthetic CV-reader PDFs are committed under
+`integrations/job-scout/data/fixture_cvs/`. From a fresh checkout, run the quality
+gate directly:
+
+```bash
+make check
+```
+
+Regenerate the examples with
+`uv run --all-packages python integrations/job-scout/scripts/generate_fixture_cvs.py`
+only when intentionally updating the committed fixtures. Networked and
+compiler-dependent tests are marked separately and excluded from the default CI job.
 
 ## Private-data contract
 
-`workspace.example.json` documents the expected local layout. The real `workspace.json`, `.env` files, generated documents, databases, and everything under `private/`—except its explanatory README—are ignored.
+`workspace.example.json` documents the expected private layout. The real `workspace.json`, `.env` files, generated documents, databases, and everything under `private/`—except its explanatory README—are ignored. `private_example/` is tracked and contains only invented data.
 
-Never put a real CV, profile, job tracker, application, email address, API key, or generated submission in `examples/`. Run `make check-public` before pushing.
+Never put a real CV, profile, job tracker, application, email address, API key, or generated submission in `examples/` or `private_example/`. Run `make check-public` before pushing.
 
 ## Project status
 
-This is a working portfolio project, not an automated hiring or submission service. The local application and engines are functional; live provider paths require user-supplied credentials. See the component READMEs and notebooks for implementation details and evaluation findings.
+This is a working local portfolio project, not an automated hiring or submission service or a hardened public deployment. AI features and keyed job sources require user-supplied credentials; some job sources are keyless. See the component READMEs and notebooks for implementation details and evaluation findings.
 
 Licensed under the [MIT License](LICENSE). Third-party attribution is recorded in [NOTICE](NOTICE).

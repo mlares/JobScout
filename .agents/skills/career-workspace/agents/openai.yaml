@@ -1,0 +1,4 @@
+interface:
+  display_name: "Career Workspace"
+  short_description: "Develop and review Career Workspace safely"
+  default_prompt: "Use $career-workspace to implement and verify the requested change in this repository."

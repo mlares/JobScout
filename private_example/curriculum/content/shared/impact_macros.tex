@@ -1,0 +1,10 @@
+% Small, role-specific evidence highlights in the example CVs.
+\usepackage{tcolorbox}
+\definecolor{impactblue}{RGB}{39,76,119}
+\definecolor{impactbackground}{RGB}{243,247,251}
+\newcommand{\chip}[1]{%
+  \tcbox[on line, colback=impactbackground, colframe=impactbackground,
+         boxrule=0pt, arc=2.5pt, left=3pt, right=3pt, top=1.5pt,
+         bottom=1.5pt, boxsep=0pt]{\normalfont\color{impactblue}#1}\hspace{2pt}\allowbreak}
+\newcommand{\impactmetrics}[1]{%
+  \par\vspace{1pt}\begingroup\raggedright\labelitemi\hspace{0.4em}#1\par\endgroup}

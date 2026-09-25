@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="${CV_REPOSITORY_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+if [[ -n "${CV_REPOSITORY_PATH:-}" ]]; then
+  REPO_DIR="$(cd "$CV_REPOSITORY_PATH" && pwd)"
+else
+  REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fi
 BUILD_ROOT="$REPO_DIR/build"
 DIST_ROOT="$REPO_DIR/dist"
 

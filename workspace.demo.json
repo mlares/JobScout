@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "private_root": "./.demo_runtime",
+  "paths": {
+    "applications": ".demo_runtime/applications",
+    "application_index": ".demo_runtime/applications/index.json",
+    "tracker": ".demo_runtime/applications/JobSearch.xlsx",
+    "sent": ".demo_runtime/sent",
+    "curriculum": "private_example/curriculum",
+    "resources": ".demo_runtime/resources",
+    "profile": "private_example/profile.json"
+  },
+  "secrets": {
+    "career_app": ".demo_runtime/secrets/career-app.env",
+    "cover_letter": ".demo_runtime/secrets/cover-letter.env",
+    "job_scout": ".demo_runtime/secrets/job-scout.env"
+  },
+  "runtime": {
+    "data_dir": ".demo_runtime/runtime",
+    "bind_host": "127.0.0.1"
+  },
+  "components": {
+    "career_app": {"path": "apps/career-app"},
+    "job_scout": {"path": "integrations/job-scout"},
+    "cover_letters": {"path": "packages/cover-letter-engine"},
+    "interviews": {"path": ".demo_runtime/preparation/interviews", "read_only": true}
+  }
+}

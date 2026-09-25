@@ -1,9 +1,9 @@
 {
-  "name": "Alex Rivera",
+  "name": "John Doe",
   "location": "Rosario, Argentina",
   "headline": "Machine learning engineer building reliable decision-support systems",
   "links": [
-    {"label": "Portfolio assistant", "url": "https://example.com/alex-assistant"}
+    {"label": "Portfolio assistant", "url": "https://example.com/john-doe-assistant"}
   ],
   "facts": [
     {"category": "work", "statement": "Built a monitored document-classification service with human review and reproducible evaluation datasets."},

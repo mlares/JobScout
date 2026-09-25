@@ -1,6 +1,7 @@
 # Local private candidate and operational data
 /private/*
 !/private/README.md
+/.demo_runtime/
 /workspace.json
 .env
 .env.*
@@ -24,6 +25,21 @@ build/
 *.xlsx
 *.key
 *.pem
+
+# Only these reviewed, fictional CV previews and parser test fixtures are
+# distributable PDFs.
+!/private_example/curriculum/dist/
+!/private_example/curriculum/dist/short/
+!/private_example/curriculum/dist/short/*/
+!/private_example/curriculum/dist/short/*/*.pdf
+!/integrations/
+!/integrations/job-scout/
+!/integrations/job-scout/data/
+!/integrations/job-scout/data/fixture_cvs/
+!/integrations/job-scout/data/fixture_cvs/junior_ds_us.pdf
+!/integrations/job-scout/data/fixture_cvs/senior_mle_eu.pdf
+!/integrations/job-scout/data/fixture_cvs/career_changer_in.pdf
+!/integrations/job-scout/data/fixture_cvs/german_pm_de.pdf
 
 # Editor / OS / local-agent history
 .DS_Store
